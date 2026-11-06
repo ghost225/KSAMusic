@@ -1,0 +1,20 @@
+# build output and releases
+bin/
+obj/
+out/
+dist/
+*.zip
+# music sources and the built library: large, rebuilt by tools/build_library.py
+sources/
+library/
+# the author's personal pack (Dynamic Music Overhaul and the KSP soundtrack can't be shared)
+dmo/
+transferwindows/
+tools/build_pack.py
+tools/dmo_dump.py
+tools/extract_ksp_ost.py
+tools/list_ksp_audio.py
+tools/ksp_audio.*
+# working notes; generated playlists (the editor writes them from pack/assignments.json)
+PLAN.md
+pack/Playlists/

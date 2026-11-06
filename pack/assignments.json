@@ -1,0 +1,263 @@
+{
+ "solFlightToKsa": false,
+ "cards": [
+  {
+   "group": "Menu",
+   "id": "menu",
+   "title": "Main menu",
+   "file": "menu",
+   "desc": "The kitten main menu",
+   "when": {
+    "scene": "MainMenu"
+   },
+   "loop": true,
+   "shuffle": false,
+   "pauseOnGamePause": false,
+   "tracks": [
+    "TW_Home"
+   ]
+  },
+  {
+   "group": "Menu",
+   "id": "credits",
+   "title": "Credits",
+   "file": "menu",
+   "desc": "The menu's Credits screen",
+   "when": {
+    "scene": "Credits"
+   },
+   "loop": true,
+   "shuffle": false,
+   "pauseOnGamePause": false,
+   "tracks": [
+    "MacLeod_GrooveGrove"
+   ]
+  },
+  {
+   "group": "Buildings",
+   "id": "editor",
+   "title": "Vehicle editor",
+   "desc": "Building a craft (VAB / SPH)",
+   "when": {
+    "scene": "VAB | SPH"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": false,
+   "tracks": [
+    "MacLeod_SneakyAdventure",
+    "TW_VabVibes"
+   ]
+  },
+  {
+   "group": "Buildings",
+   "id": "rnd",
+   "title": "R&D",
+   "desc": "The tech tree (with KSAScience)",
+   "when": {
+    "scene": "RnDComplex"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": false,
+   "tracks": [
+    "TW_LabcoatsGalore"
+   ]
+  },
+  {
+   "group": "Buildings",
+   "id": "ksc_day",
+   "title": "Space centre (day)",
+   "desc": "Space-centre view, daytime",
+   "when": {
+    "scene": "SpaceCentre",
+    "timeOfDay": "DayAM | DayPM | TwilightAM"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": false,
+   "tracks": [
+    "TW_MyCapsuleMySnacksAndMe"
+   ]
+  },
+  {
+   "group": "Buildings",
+   "id": "ksc_night",
+   "title": "Space centre (night)",
+   "desc": "Space-centre view, evening and night",
+   "when": {
+    "scene": "SpaceCentre",
+    "timeOfDay": "TwilightPM | NightAM | NightPM"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": false,
+   "tracks": [
+    "TW_BalconyMoongazing"
+   ]
+  },
+  {
+   "group": "Buildings",
+   "id": "tracking",
+   "title": "Tracking station",
+   "desc": "Map view with no flight",
+   "when": {
+    "scene": "TrackingStation"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": false,
+   "tracks": [
+    "TW_LullabyForAPlanetarium"
+   ]
+  },
+  {
+   "group": "Flight",
+   "id": "launch",
+   "title": "Launch",
+   "desc": "The first climb from the pad or runway (not bounces or re-entry)",
+   "when": {
+    "scene": "Flight",
+    "initialAscent": true
+   },
+   "loop": true,
+   "shuffle": false,
+   "pauseOnGamePause": true,
+   "tracks": [
+    "KSAMusic_Silence"
+   ]
+  },
+  {
+   "group": "Flight",
+   "id": "landed",
+   "title": "On the ground",
+   "desc": "Landed, splashed down, or on the pad",
+   "when": {
+    "scene": "Flight",
+    "situation": "LANDED | SPLASHED | PRELAUNCH"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": true,
+   "tracks": [
+    "KSAMusic_Silence"
+   ]
+  },
+  {
+   "group": "Flight",
+   "id": "atmo",
+   "title": "Flying in atmosphere",
+   "desc": "Anywhere off the ground inside an atmosphere: planes, rockets climbing, re-entry",
+   "when": {
+    "scene": "Flight",
+    "inAtmosphere": true
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": true,
+   "tracks": [
+    "KSAMusic_Silence"
+   ]
+  },
+  {
+   "group": "Flight",
+   "id": "interplanetary",
+   "title": "Interplanetary",
+   "desc": "Orbiting the star itself, between the planets",
+   "when": {
+    "scene": "Flight",
+    "bodyName": "Sun | Kerbol | Sol"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": true,
+   "tracks": [
+    "MacLeod_Arcadia",
+    "MacLeod_BathedInTheLight",
+    "MacLeod_BrittleRille",
+    "MacLeod_DreamyFlashback",
+    "MacLeod_FrostWaltz",
+    "MacLeod_FrostWaltzAlternate",
+    "MacLeod_FrozenStar",
+    "MacLeod_GrooveGrove",
+    "MacLeod_ImpactLento",
+    "MacLeod_Wizardtorium"
+   ]
+  },
+  {
+   "group": "Flight",
+   "id": "escaping",
+   "title": "Leaving a body",
+   "desc": "On an escape trajectory",
+   "when": {
+    "scene": "Flight",
+    "situation": "ESCAPING"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": true,
+   "tracks": [
+    "MacLeod_Arcadia",
+    "MacLeod_BathedInTheLight",
+    "MacLeod_BrittleRille",
+    "MacLeod_DreamyFlashback",
+    "MacLeod_FrostWaltz",
+    "MacLeod_FrostWaltzAlternate",
+    "MacLeod_FrozenStar",
+    "MacLeod_GrooveGrove",
+    "MacLeod_ImpactLento",
+    "MacLeod_Wizardtorium"
+   ]
+  },
+  {
+   "group": "Flight",
+   "id": "suborbital",
+   "title": "Sub-orbital",
+   "desc": "Up but coming back down: hops and re-entry",
+   "when": {
+    "scene": "Flight",
+    "situation": "SUB_ORBITAL"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": true,
+   "tracks": [
+    "MacLeod_Arcadia",
+    "MacLeod_BathedInTheLight",
+    "MacLeod_BrittleRille",
+    "MacLeod_DreamyFlashback",
+    "MacLeod_FrostWaltz",
+    "MacLeod_FrostWaltzAlternate",
+    "MacLeod_FrozenStar",
+    "MacLeod_GrooveGrove",
+    "MacLeod_ImpactLento",
+    "MacLeod_Wizardtorium"
+   ]
+  },
+  {
+   "group": "Flight",
+   "id": "orbit",
+   "title": "In orbit",
+   "desc": "Orbiting any planet or moon",
+   "when": {
+    "scene": "Flight",
+    "situation": "ORBITING"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": true,
+   "tracks": [
+    "MacLeod_Arcadia",
+    "MacLeod_BathedInTheLight",
+    "MacLeod_BrittleRille",
+    "MacLeod_DreamyFlashback",
+    "MacLeod_FrostWaltz",
+    "MacLeod_FrostWaltzAlternate",
+    "MacLeod_FrozenStar",
+    "MacLeod_GrooveGrove",
+    "MacLeod_ImpactLento",
+    "MacLeod_Wizardtorium"
+   ]
+  }
+ ]
+}

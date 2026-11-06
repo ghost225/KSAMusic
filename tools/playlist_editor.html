@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KSAMusic Playlists</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --panel2: #1c2330; --line: #2b3444; --text: #e6edf3; --muted: #8b98a9;
+    --accent: #f59e3b; --accent2: #5aa8ff; --chip: #233044; --chipHover: #2d3d57; --drop: #2a3a24; --danger: #ff6b6b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif; height: 100vh; display: flex; flex-direction: column; }
+  header { display: flex; align-items: center; gap: 14px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; }
+  header h1 { font-size: 16px; margin: 0; letter-spacing: .5px; }
+  header .spacer { flex: 1; }
+  header label { color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  button { background: var(--chip); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; font: inherit; }
+  button:hover { background: var(--chipHover); }
+  button.primary { background: var(--accent); color: #1b1300; border-color: var(--accent); font-weight: 600; }
+  #status { color: var(--muted); min-width: 160px; }
+  main { flex: 1; display: grid; grid-template-columns: 360px 1fr; min-height: 0; }
+  #library { border-right: 1px solid var(--line); overflow: auto; padding: 10px 12px 40px; background: var(--panel); }
+  #library .filters { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+  #library input[type=search] { width: 100%; padding: 6px 8px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 6px; margin-bottom: 8px; }
+  .album { margin: 12px 0 4px; color: var(--accent); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .6px; display: flex; justify-content: space-between; }
+  .album small { color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .track { display: flex; align-items: center; gap: 8px; padding: 5px 8px; margin: 3px 0; background: var(--chip); border-radius: 6px; cursor: grab; border: 1px solid transparent; }
+  .track:hover { background: var(--chipHover); }
+  .track.used { border-color: #3c5a3c; }
+  .track .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .track .dur, .chip .dur { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
+  .track .lic { font-size: 10px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+  .play { width: 26px; height: 26px; padding: 0; border-radius: 50%; flex: none; font-size: 11px; }
+  .play.on { background: var(--accent); color: #1b1300; }
+  #cards { overflow: auto; padding: 12px 16px 60px; }
+  .group { margin: 6px 0 18px; }
+  .group h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin: 8px 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 6px; min-height: 140px; }
+  .card.over { border-color: var(--accent); background: var(--drop); }
+  .card .head { display: flex; align-items: baseline; gap: 8px; }
+  .card .title { font-weight: 600; flex: 1; }
+  .card .desc { color: var(--muted); font-size: 12px; }
+  .card .opts { display: flex; gap: 10px; color: var(--muted); font-size: 12px; }
+  .card .opts label { display: flex; gap: 4px; align-items: center; }
+  .list { flex: 1; display: flex; flex-direction: column; gap: 4px; min-height: 48px; border: 1px dashed var(--line); border-radius: 8px; padding: 6px; }
+  .list .empty { color: var(--muted); font-size: 12px; text-align: center; margin: auto; }
+  .chip { display: flex; align-items: center; gap: 6px; background: var(--chip); border-radius: 6px; padding: 4px 6px; cursor: grab; }
+  .chip.dragging, .track.dragging { opacity: .4; }
+  .chip .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chip .x { background: none; border: none; color: var(--muted); padding: 0 4px; font-size: 16px; line-height: 1; }
+  .chip .x:hover { color: var(--danger); }
+  .chip.marker { height: 2px; padding: 0; background: var(--accent); }
+  .total { color: var(--muted); font-size: 12px; text-align: right; }
+  .remove-card { background: none; border: none; color: var(--muted); padding: 0 4px; }
+  .remove-card:hover { color: var(--danger); }
+  .add { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; background: var(--panel2); border: 1px dashed var(--line); border-radius: 10px; padding: 10px; }
+  .add input, .add select { background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; font: inherit; }
+  .legend { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+  #bar { display: grid; grid-template-columns: auto minmax(160px, 1.2fr) minmax(200px, 2fr) auto; gap: 16px; align-items: center;
+         padding: 10px 16px; border-top: 1px solid var(--line); background: var(--panel); }
+  #bar .ctrl { display: flex; gap: 6px; align-items: center; }
+  #bar .ctrl button { width: 34px; height: 34px; padding: 0; border-radius: 50%; font-size: 13px; }
+  #bar .ctrl #pp { width: 42px; height: 42px; background: var(--accent); color: #1b1300; border-color: var(--accent); font-size: 16px; }
+  #bar .now { min-width: 0; }
+  #bar .now .t { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #bar .now .a { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #bar .seek { display: flex; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; }
+  #bar input[type=range] { flex: 1; accent-color: var(--accent); }
+  #bar .vol { display: flex; gap: 6px; align-items: center; color: var(--muted); }
+  #bar .vol input { width: 100px; }
+  #bar .from { color: var(--muted); font-size: 11px; }
+  .chip.current, .track.current { outline: 1px solid var(--accent); }
+  @media (max-width: 900px) { #bar { grid-template-columns: auto 1fr; } #bar .seek, #bar .vol { grid-column: 1 / -1; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>KSAMusic · Playlist editor</h1>
+  <span class="legend">Drag tracks from the left onto a situation. Drag chips to reorder or move them; × removes.</span>
+  <span class="spacer"></span>
+  <label title="Leave flight in Sol to KSA's own music; menus and buildings still use your picks"><input type="checkbox" id="solFlight"> Sol flight: KSA's own music</label>
+  <span id="status"></span>
+  <button id="reset" title="Throw away your changes and go back to the playlists the mod ships with">Reset to preset</button>
+  <button class="primary" id="save">Save playlists</button>
+</header>
+<main>
+  <section id="library">
+    <input type="search" id="search" placeholder="Search tracks…">
+    <div class="filters">
+      <button data-filter="all">All</button>
+      <button data-filter="pack">Included</button>
+      <button data-filter="own">Your music</button>
+      <button data-filter="game" title="Kitten Space Agency's own music, played from your game install (not shipped)">KSA</button>
+      <button data-filter="unused">Not used yet</button>
+    </div>
+    <div class="legend" id="ownHint"></div>
+    <div id="tracks"></div>
+  </section>
+  <section id="cards"></section>
+</main>
+<footer id="bar">
+  <div class="ctrl">
+    <button id="prev" title="Previous">⏮</button>
+    <button id="pp" title="Play / pause">▶</button>
+    <button id="next" title="Next">⏭</button>
+  </div>
+  <div class="now"><div class="t" id="nowTitle">Nothing playing</div><div class="a" id="nowSub">Press ▶ on any track to listen</div></div>
+  <div class="seek"><span id="cur">0:00</span><input type="range" id="seek" min="0" max="1000" value="0"><span id="len">0:00</span></div>
+  <div class="vol"><span title="Volume">🔊</span><input type="range" id="vol" min="0" max="100" value="80"></div>
+</footer>
+<audio id="player" preload="none"></audio>
+<script>
+// Situations, in the order KSAMusic tests them (the first matching playlist wins). `when` becomes the playWhen block.
+const BASE = [
+  { group: "Menu", id: "menu", title: "Main menu", file: "menu", desc: "The kitten main menu", when: { scene: "MainMenu" }, loop: true, shuffle: false, pauseOnGamePause: false },
+  { group: "Menu", id: "credits", title: "Credits", file: "menu", desc: "The menu's Credits screen", when: { scene: "Credits" }, loop: true, shuffle: false, pauseOnGamePause: false },
+  { group: "Buildings", id: "editor", title: "Vehicle editor", desc: "Building a craft (VAB / SPH)", when: { scene: "VAB | SPH" }, loop: true, shuffle: true, pauseOnGamePause: false },
+  { group: "Buildings", id: "rnd", title: "R&D", desc: "An R&D / tech tree screen, if a mod adds one", when: { scene: "RnDComplex" }, loop: true, shuffle: true, pauseOnGamePause: false },
+  { group: "Buildings", id: "ksc_day", title: "Space centre (day)", desc: "A space-centre view by day, if a mod adds one", when: { scene: "SpaceCentre", timeOfDay: "DayAM | DayPM | TwilightAM" }, loop: true, shuffle: true, pauseOnGamePause: false },
+  { group: "Buildings", id: "ksc_night", title: "Space centre (night)", desc: "A space-centre view by evening and night, if a mod adds one", when: { scene: "SpaceCentre", timeOfDay: "TwilightPM | NightAM | NightPM" }, loop: true, shuffle: true, pauseOnGamePause: false },
+  { group: "Buildings", id: "tracking", title: "Tracking station", desc: "Map view with no flight", when: { scene: "TrackingStation" }, loop: true, shuffle: true, pauseOnGamePause: false },
+  { group: "Flight", id: "launch", title: "Launch", desc: "The first climb from the pad or runway (not bounces or re-entry)", when: { scene: "Flight", initialAscent: true }, loop: true, shuffle: false, pauseOnGamePause: true },
+  { group: "Flight", id: "landed", title: "On the ground", desc: "Landed, splashed down, or on the pad", when: { scene: "Flight", situation: "LANDED | SPLASHED | PRELAUNCH" }, loop: true, shuffle: true, pauseOnGamePause: true },
+  { group: "Flight", id: "atmo", title: "Flying in atmosphere", desc: "Anywhere off the ground inside an atmosphere: planes, rockets climbing, re-entry", when: { scene: "Flight", inAtmosphere: true }, loop: true, shuffle: true, pauseOnGamePause: true },
+  { group: "Flight", id: "interplanetary", title: "Interplanetary", desc: "Orbiting the star itself, between the planets", when: { scene: "Flight", bodyName: "Sun | Kerbol | Sol" }, loop: true, shuffle: true, pauseOnGamePause: true },
+  { group: "Flight", id: "escaping", title: "Leaving a body", desc: "On an escape trajectory", when: { scene: "Flight", situation: "ESCAPING" }, loop: true, shuffle: true, pauseOnGamePause: true },
+  { group: "Flight", id: "suborbital", title: "Sub-orbital", desc: "Up but coming back down: hops and re-entry", when: { scene: "Flight", situation: "SUB_ORBITAL" }, loop: true, shuffle: true, pauseOnGamePause: true },
+  { group: "Flight", id: "orbit", title: "In orbit", desc: "Orbiting any planet or moon", when: { scene: "Flight", situation: "ORBITING" }, loop: true, shuffle: true, pauseOnGamePause: true },
+];
+const SITUATIONS = {
+  any: { label: "anywhere around it", when: {} },
+  orbit: { label: "in orbit", when: { situation: "ORBITING | SUB_ORBITAL | ESCAPING" } },
+  landed: { label: "on the surface", when: { situation: "LANDED | SPLASHED" } },
+  flying: { label: "flying in its atmosphere", when: { situation: "FLYING" } },
+};
+// The default picks: as close to stock KSP as open music allows (user, 2026-11-06). KSP played music only in space
+// (Kevin MacLeod's tracks, shuffled) and kept quiet on the pad, in the atmosphere and on the ground; the menu, VAB,
+// tracking station and R&D had themes of their own. Silence is a shipped track, since an empty situation would hand
+// over to KSA's own music.
+const KSP_SPACE = ["MacLeod_Arcadia", "MacLeod_BathedInTheLight", "MacLeod_BrittleRille", "MacLeod_DreamyFlashback",
+  "MacLeod_FrostWaltz", "MacLeod_FrostWaltzAlternate", "MacLeod_FrozenStar", "MacLeod_GrooveGrove", "MacLeod_ImpactLento", "MacLeod_Wizardtorium"];
+const SILENCE = ["KSAMusic_Silence"];
+const DEFAULTS = {
+  menu: ["TW_Home"], credits: ["MacLeod_GrooveGrove"], editor: ["MacLeod_SneakyAdventure", "TW_VabVibes"], rnd: ["TW_LabcoatsGalore"],
+  ksc_day: ["TW_MyCapsuleMySnacksAndMe"], ksc_night: ["TW_BalconyMoongazing"], tracking: ["TW_LullabyForAPlanetarium"],
+  launch: SILENCE, landed: SILENCE, atmo: SILENCE,
+  interplanetary: KSP_SPACE, escaping: KSP_SPACE, suborbital: KSP_SPACE, orbit: KSP_SPACE,
+};
+const DEFAULT_BODIES = [];
+
+let library = [], byId = {}, state = null, filter = "all", query = "", ownDir = "", replaceWarning = null;
+const $ = s => document.querySelector(s);
+const fmt = s => s == null ? "" : `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
+
+function bodyCard(b) {
+  const s = SITUATIONS[b.sit] || SITUATIONS.any;
+  return { group: "Places", id: "body_" + b.body.replace(/[^A-Za-z0-9]/g, "") + "_" + b.sit, title: b.title || b.body.split("|")[0].trim(),
+           desc: `Around ${b.body.split("|").map(x => x.trim()).join(" / ")}, ${s.label}`, custom: { body: b.body, sit: b.sit },
+           when: { scene: "Flight", bodyName: b.body, ...s.when }, loop: true, shuffle: true, pauseOnGamePause: true, tracks: b.tracks || [] };
+}
+
+function freshState() {
+  return { solFlightToKsa: false,
+           cards: [...DEFAULT_BODIES.map(bodyCard), ...BASE.map(c => ({ ...c, tracks: [...(DEFAULTS[c.id] || [])] }))] };
+}
+
+// Place body cards before the general flight cards, so "around the Mun" wins over "in orbit".
+function ordered() {
+  const order = c => c.file === "menu" ? 0 : c.group === "Buildings" ? 1 : c.custom ? 2 : 3;
+  return [...state.cards].sort((a, b) => order(a) - order(b));
+}
+
+// keep cards in sync with BASE (new situations added later show up; their saved picks are kept)
+function syncBase() {
+  for (const b of BASE) {
+    const have = state.cards.find(c => c.id === b.id);
+    if (have) Object.assign(have, { group: b.group, title: b.title, desc: b.desc, when: b.when, file: b.file });
+    else state.cards.push({ ...b, tracks: [] });
+  }
+}
+
+function usedIds() { const u = new Set(); state.cards.forEach(c => c.tracks.forEach(t => u.add(t))); return u; }
+
+function renderLibrary() {
+  const used = usedIds(), box = $("#tracks");
+  box.innerHTML = "";
+  let album = null;
+  for (const t of library) {
+    if (filter === "pack" && !t.pack) continue;
+    if (filter === "own" && !t.own) continue;
+    if (filter === "game" && !t.game) continue;
+    if (filter === "unused" && used.has(t.id)) continue;
+    if (query && !(t.title + " " + t.album + " " + t.artist).toLowerCase().includes(query)) continue;
+    if (t.album !== album) {
+      album = t.album;
+      const h = document.createElement("div");
+      h.className = "album";
+      h.innerHTML = `<span>${t.album}</span><small>${t.artist} · ${t.license}</small>`;
+      box.appendChild(h);
+    }
+    const el = document.createElement("div");
+    el.className = "track" + (used.has(t.id) ? " used" : "");
+    el.draggable = true;
+    el.dataset.id = t.id;
+    el.title = `${t.title} — ${t.artist}\n${t.attribution}`;
+    el.innerHTML = `<button class="play" data-play="${t.id}">▶</button><span class="name">${t.title}</span><span class="dur">${fmt(t.duration)}</span>`;
+    el.addEventListener("dragstart", e => { e.dataTransfer.setData("text/plain", JSON.stringify({ id: t.id })); el.classList.add("dragging"); });
+    el.addEventListener("dragend", () => el.classList.remove("dragging"));
+    box.appendChild(el);
+  }
+  syncPlayButtons();
+}
+
+function renderCards() {
+  const root = $("#cards");
+  root.innerHTML = "";
+  const groups = ["Menu", "Buildings", "Places", "Flight"];
+  const help = { Places: "Body-specific music wins over the general flight situations below.",
+                 Flight: "Checked in this order; the first one that matches plays." };
+  for (const g of groups) {
+    const cards = ordered().filter(c => c.group === g);
+    const sec = document.createElement("div");
+    sec.className = "group";
+    sec.innerHTML = `<h2>${g}</h2>` + (help[g] ? `<div class="legend">${help[g]}</div>` : "");
+    const grid = document.createElement("div");
+    grid.className = "grid";
+    cards.forEach(c => grid.appendChild(cardEl(c)));
+    if (g === "Places") grid.appendChild(addForm());
+    sec.appendChild(grid);
+    root.appendChild(sec);
+  }
+}
+
+function cardEl(c) {
+  const el = document.createElement("div");
+  el.className = "card";
+  const total = c.tracks.reduce((s, id) => s + (byId[id]?.duration || 0), 0);
+  el.innerHTML = `
+    <div class="head"><span class="title">${c.title}</span>${c.custom ? `<button class="remove-card" title="Remove this place">✕</button>` : ""}</div>
+    <div class="desc">${c.desc}</div>
+    <div class="list"></div>
+    <div class="opts">
+      <label><input type="checkbox" data-opt="shuffle" ${c.shuffle ? "checked" : ""}> shuffle</label>
+      <label><input type="checkbox" data-opt="loop" ${c.loop ? "checked" : ""}> loop</label>
+      <label title="Pause the music while the game is paused"><input type="checkbox" data-opt="pauseOnGamePause" ${c.pauseOnGamePause ? "checked" : ""}> pause with game</label>
+      <span class="spacer" style="flex:1"></span><span class="total">${c.tracks.length ? `${c.tracks.length} · ${fmt(total)}` : ""}</span>
+    </div>`;
+  const list = el.querySelector(".list");
+  if (!c.tracks.length) list.innerHTML = `<div class="empty">Drop tracks here (empty = KSA's own music)</div>`;
+  c.tracks.forEach((id, i) => {
+    const t = byId[id];
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.draggable = true;
+    chip.innerHTML = `<button class="play" data-play="${id}">▶</button><span class="name">${t ? t.title : id + " (missing)"}</span><span class="dur">${fmt(t?.duration)}</span><button class="x" title="Remove">×</button>`;
+    chip.querySelector(".x").onclick = () => { c.tracks.splice(i, 1); changed(); };
+    chip.addEventListener("dragstart", e => { e.dataTransfer.setData("text/plain", JSON.stringify({ id, from: c.id, index: i })); chip.classList.add("dragging"); });
+    chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+    list.appendChild(chip);
+  });
+  el.querySelectorAll("[data-opt]").forEach(cb => cb.onchange = () => { c[cb.dataset.opt] = cb.checked; dirty(); });
+  el.querySelector(".remove-card")?.addEventListener("click", () => { state.cards = state.cards.filter(x => x !== c); changed(); });
+  // drop: anywhere on the card; the drop position among the chips decides where it goes
+  el.addEventListener("dragover", e => { e.preventDefault(); el.classList.add("over"); });
+  el.addEventListener("dragleave", e => { if (!el.contains(e.relatedTarget)) el.classList.remove("over"); });
+  el.addEventListener("drop", e => {
+    e.preventDefault();
+    el.classList.remove("over");
+    let data;
+    try { data = JSON.parse(e.dataTransfer.getData("text/plain")); } catch { return; }
+    const chips = [...list.querySelectorAll(".chip")];
+    let at = chips.findIndex(ch => e.clientY < ch.getBoundingClientRect().top + ch.offsetHeight / 2);
+    if (at < 0) at = c.tracks.length;
+    if (data.from) {                                   // moving a chip
+      const src = state.cards.find(x => x.id === data.from);
+      if (!src) return;
+      src.tracks.splice(data.index, 1);
+      if (src === c && data.index < at) at--;
+      if (src !== c && c.tracks.includes(data.id)) { changed(); return; }
+    } else if (c.tracks.includes(data.id)) return;     // already here
+    c.tracks.splice(at, 0, data.id);
+    changed();
+  });
+  return el;
+}
+
+// "Add a place": pick bodies from the game's own systems (KSAMusic's snapshot, or the system files), so a misspelt
+// name can't silently never match. Free typing is only offered when there's no list at all.
+let bodiesData = null, pickSystem = null, pickQuery = "";
+const MAIN_SYSTEMS = ["Sol", "Kerbol", "KerbolInterstellar"];
+
+function systemsOrdered() {
+  if (!bodiesData?.systems?.length) return [];
+  const rank = s => s.loaded ? -1 : MAIN_SYSTEMS.includes(s.id) ? MAIN_SYSTEMS.indexOf(s.id) : 99;
+  return [...bodiesData.systems].sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
+}
+
+// star > planet > moon order, indented by depth
+function treeOptions(sys) {
+  const kids = {};
+  sys.bodies.forEach(b => (kids[b.parent] ||= []).push(b));
+  const ids = new Set(sys.bodies.map(b => b.id)), out = [];
+  const walk = (b, depth) => {
+    out.push({ ...b, depth });
+    (kids[b.id] || []).forEach(k => walk(k, depth + 1));
+  };
+  sys.bodies.filter(b => !b.parent || !ids.has(b.parent)).forEach(b => walk(b, 0));
+  return out;
+}
+
+function addForm() {
+  const el = document.createElement("div");
+  el.className = "add";
+  const systems = systemsOrdered();
+  const sitOptions = Object.entries(SITUATIONS).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("");
+  if (!systems.length) {
+    el.innerHTML = `<b>Add a place</b>
+      <div class="legend" style="width:100%">No body list yet: start KSA once with KSAMusic and it is filled in from the game. Until then you can type
+      exact body ids (separate several with |); a misspelt name never matches.</div>
+      <input id="newBody" placeholder="Body id, e.g. Duna" size="16"><select id="newSit">${sitOptions}</select>
+      <input id="newTitle" placeholder="Card title (optional)" size="14"><button id="addBody">Add</button>`;
+    el.querySelector("#addBody").onclick = () => addBodyCard(el.querySelector("#newBody").value.trim(), el.querySelector("#newSit").value, el.querySelector("#newTitle").value.trim());
+    return el;
+  }
+  if (!pickSystem || !systems.some(x => x.id === pickSystem)) pickSystem = systems[0].id;
+  const sys = systems.find(x => x.id === pickSystem);
+  const q = pickQuery.toLowerCase();
+  const opts = treeOptions(sys).filter(b => !q || b.id.toLowerCase().includes(q));
+  const shown = opts.slice(0, 400);
+  el.innerHTML = `<b style="width:100%">Add a place</b>
+    <select id="pickSystem" title="Star system">${systems.map(x => `<option value="${x.id}" ${x.id === pickSystem ? "selected" : ""}>${x.name}${x.loaded ? " (loaded)" : ""} · ${x.bodies.length}</option>`).join("")}</select>
+    <input id="pickQuery" type="search" placeholder="Search bodies…" value="${pickQuery.replace(/"/g, "&quot;")}" size="14">
+    <select id="pickBodies" multiple size="9" style="width:100%">${shown.map(b =>
+      `<option value="${b.id}">${"\u00a0\u00a0\u00a0".repeat(b.depth)}${b.id}  ·  ${b.kind}</option>`).join("")}</select>
+    ${opts.length > shown.length ? `<div class="legend" style="width:100%">${opts.length - shown.length} more: search to narrow it down</div>` : ""}
+    <select id="newSit">${sitOptions}</select>
+    <input id="newTitle" placeholder="Card title (optional)" size="14">
+    <button id="addBody">Add</button>
+    <div class="legend" style="width:100%">Ctrl- or Shift-click to pick several bodies for one card.${bodiesData.fromFiles ? " List read from the game's system files; it updates from the game itself once KSA has run with KSAMusic." : ""}</div>`;
+  el.querySelector("#pickSystem").onchange = e => { pickSystem = e.target.value; pickQuery = ""; renderCards(); };
+  el.querySelector("#pickQuery").oninput = e => {
+    pickQuery = e.target.value;
+    const pos = e.target.selectionStart;
+    renderCards();
+    const again = document.querySelector("#pickQuery");
+    again.focus();
+    again.setSelectionRange(pos, pos);
+  };
+  el.querySelector("#addBody").onclick = () => {
+    const picked = [...el.querySelector("#pickBodies").selectedOptions].map(o => o.value);
+    if (!picked.length) { alert("Pick one or more bodies from the list first."); return; }
+    addBodyCard(picked.join(" | "), el.querySelector("#newSit").value, el.querySelector("#newTitle").value.trim() || picked.join(" / "));
+  };
+  return el;
+}
+
+function addBodyCard(body, sit, title) {
+  if (!body) return;
+  const card = bodyCard({ body, sit, title });
+  if (state.cards.some(c => c.id === card.id)) { alert("There's already a card for that place and situation."); return; }
+  state.cards.push(card);
+  changed();
+}
+
+// player: ▶ on a track plays it; prev/next walk the list it was started from (a situation card, or the library as
+// filtered), and a finished track moves on to the next one there.
+const player = $("#player");
+let playing = null, queue = [], queueFrom = "";
+try { const v = localStorage.getItem("ksamusic.vol"); if (v != null) $("#vol").value = v; } catch {}
+player.volume = $("#vol").value / 100;
+
+function listFor(button) {
+  const card = button.closest(".card");
+  if (card) {
+    const title = card.querySelector(".title").textContent;
+    const c = state.cards.find(x => x.title === title);
+    return { ids: c ? [...c.tracks] : [], from: title };
+  }
+  return { ids: [...document.querySelectorAll("#tracks .track")].map(t => t.dataset.id), from: "Library" };
+}
+
+function playId(id) {
+  const t = byId[id];
+  if (!t) return;
+  playing = id;
+  player.src = "/audio/" + encodeURIComponent(id);
+  player.play();
+  $("#nowTitle").textContent = t.title;
+  $("#nowSub").textContent = [t.album, t.artist].filter(Boolean).join(" · ") + (queueFrom ? `  ·  from ${queueFrom}` : "");
+  syncPlayButtons();
+}
+
+function step(dir) {
+  if (!queue.length) return;
+  let i = queue.indexOf(playing);
+  i = i < 0 ? 0 : (i + dir + queue.length) % queue.length;
+  playId(queue[i]);
+}
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-play]");
+  if (!b) return;
+  const id = b.dataset.play;
+  if (playing === id) { player.paused ? player.play() : player.pause(); return; }
+  const l = listFor(b);
+  queue = l.ids; queueFrom = l.from;
+  playId(id);
+});
+$("#pp").onclick = () => {
+  if (!playing) { const first = document.querySelector("#tracks .track"); if (first) first.querySelector("[data-play]").click(); return; }
+  player.paused ? player.play() : player.pause();
+};
+$("#prev").onclick = () => player.currentTime > 3 ? (player.currentTime = 0) : step(-1);
+$("#next").onclick = () => step(1);
+$("#vol").oninput = e => { player.volume = e.target.value / 100; try { localStorage.setItem("ksamusic.vol", e.target.value); } catch {} };
+let seeking = false;
+$("#seek").oninput = () => { seeking = true; $("#cur").textContent = fmt($("#seek").value / 1000 * (player.duration || 0)); };
+$("#seek").onchange = () => { if (player.duration) player.currentTime = $("#seek").value / 1000 * player.duration; seeking = false; };
+player.addEventListener("timeupdate", () => {
+  if (seeking || !player.duration) return;
+  $("#seek").value = Math.round(player.currentTime / player.duration * 1000);
+  $("#cur").textContent = fmt(player.currentTime);
+  $("#len").textContent = fmt(player.duration);
+});
+player.addEventListener("play", syncPlayButtons);
+player.addEventListener("pause", syncPlayButtons);
+player.addEventListener("ended", () => queue.length > 1 ? step(1) : syncPlayButtons());
+document.addEventListener("keydown", e => {
+  if (e.code === "Space" && !["INPUT", "SELECT", "TEXTAREA", "BUTTON"].includes(document.activeElement.tagName)) { e.preventDefault(); $("#pp").click(); }
+});
+function syncPlayButtons() {
+  const on = playing && !player.paused;
+  document.querySelectorAll("[data-play]").forEach(b => {
+    const cur = b.dataset.play === playing;
+    b.classList.toggle("on", cur && on);
+    b.textContent = cur && on ? "❚❚" : "▶";
+    b.closest(".chip, .track")?.classList.toggle("current", cur);
+  });
+  $("#pp").textContent = on ? "❚❚" : "▶";
+}
+
+function dirty() { $("#status").textContent = "Unsaved changes"; }
+function changed() { dirty(); renderCards(); renderLibrary(); }
+
+$("#save").onclick = async () => {
+  state.solFlightToKsa = $("#solFlight").checked;
+  const body = { solFlightToKsa: state.solFlightToKsa, cards: ordered().map(c => ({ ...c })) };
+  if (replaceWarning) {
+    if (!confirm(replaceWarning + "\n\nSave anyway?")) return;
+    body.replaceHandWritten = true;
+  }
+  const r = await fetch("/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json();
+  if (j.saved) replaceWarning = null;   // saved once: from now on these are editor playlists
+  else if (j.error) alert(j.error);
+  $("#status").textContent = j.saved ? `Saved · ${j.tracks} tracks used` : "Save failed";
+};
+$("#solFlight").onchange = dirty;
+$("#reset").onclick = async () => {
+  const preset = await (await fetch("/preset.json")).json();
+  if (!confirm("Go back to the preset playlists? Your changes are lost when you then Save.")) return;
+  state = preset ? preset : freshState();
+  syncBase();
+  $("#solFlight").checked = !!state.solFlightToKsa;
+  changed();
+};
+$("#search").oninput = e => { query = e.target.value.toLowerCase(); renderLibrary(); };
+document.querySelectorAll("[data-filter]").forEach(b => b.onclick = () => { filter = b.dataset.filter; renderLibrary(); });
+
+(async () => {
+  try { bodiesData = await (await fetch("/bodies.json")).json(); } catch { bodiesData = null; }
+  const lib = await (await fetch("/library.json")).json();
+  library = lib.tracks;
+  ownDir = lib.ownMusicDir || "";
+  replaceWarning = lib.replaceWarning || null;
+  if (ownDir) $("#ownHint").textContent = `Your own music: put .ogg files in ${ownDir}, then reload this page.`;
+  library.forEach(t => byId[t.id] = t);
+  const saved = await (await fetch("/state.json")).json();
+  state = saved || freshState();
+  syncBase();
+  $("#solFlight").checked = !!state.solFlightToKsa;
+  $("#status").textContent = replaceWarning ? "Your current playlists weren't made here: Save will ask first"
+    : saved ? "Loaded your saved picks" : "Defaults: adjust, then Save";
+  renderCards();
+  renderLibrary();
+})();
+</script>
+</body>
+</html>
