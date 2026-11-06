@@ -14,7 +14,7 @@ Situational music for [Kitten Space Agency](https://ahwoo.com/): the right track
 
 ## Music included
 
-All of it can be shared; the full credits, with links, are in `CREDITS.md` in the download.
+All of it can be shared; the full credits, with links, are in [`CREDITS.md`](CREDITS.md) (also in the download).
 
 - **Transfer Windows**, Vol. 1, Vol. 2 and The Dark Sounds Of The Mun EP, by [Askerad](https://www.youtube.com/channel/UCkmEzU58CnNtMk8eDCPG6EQ), CC BY 3.0
 - **Kevin MacLeod**'s tracks from KSP's soundtrack ([incompetech.com](https://incompetech.com)), CC BY 4.0

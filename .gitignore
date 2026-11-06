@@ -18,3 +18,4 @@ tools/ksp_audio.*
 # working notes; generated playlists (the editor writes them from pack/assignments.json)
 PLAN.md
 pack/Playlists/
+pack/my-*.json
