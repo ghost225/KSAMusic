@@ -124,17 +124,19 @@ const BASE = [
   { group: "Flight", id: "launch", title: "Launch", desc: "The first climb from the pad or runway (not bounces or re-entry)", when: { scene: "Flight", initialAscent: true }, loop: true, shuffle: false, pauseOnGamePause: true },
   { group: "Flight", id: "landed", title: "On the ground", desc: "Landed, splashed down, or on the pad", when: { scene: "Flight", situation: "LANDED | SPLASHED | PRELAUNCH" }, loop: true, shuffle: true, pauseOnGamePause: true },
   { group: "Flight", id: "atmo", title: "Flying in atmosphere", desc: "Anywhere off the ground inside an atmosphere: planes, rockets climbing, re-entry", when: { scene: "Flight", inAtmosphere: true }, loop: true, shuffle: true, pauseOnGamePause: true },
-  { group: "Flight", id: "interplanetary", title: "Interplanetary", desc: "Orbiting the star itself, between the planets", when: { scene: "Flight", bodyName: "Sun | Kerbol | Sol" }, loop: true, shuffle: true, pauseOnGamePause: true },
-  { group: "Flight", id: "escaping", title: "Leaving a body", desc: "On an escape trajectory", when: { scene: "Flight", situation: "ESCAPING" }, loop: true, shuffle: true, pauseOnGamePause: true },
-  { group: "Flight", id: "suborbital", title: "Sub-orbital", desc: "Up but coming back down: hops and re-entry", when: { scene: "Flight", situation: "SUB_ORBITAL" }, loop: true, shuffle: true, pauseOnGamePause: true },
-  { group: "Flight", id: "orbit", title: "In orbit", desc: "Orbiting any planet or moon", when: { scene: "Flight", situation: "ORBITING" }, loop: true, shuffle: true, pauseOnGamePause: true },
+  { group: "Flight", id: "space", title: "Space", desc: "Off the ground and outside any atmosphere: orbits, hops, transfers. For one body, or between the planets, add a place above.", when: { scene: "Flight", situation: "SUB_ORBITAL | ORBITING | ESCAPING", inAtmosphere: false }, loop: true, shuffle: true, pauseOnGamePause: true },
 ];
+// Older playlists had these instead of Space; their tracks move into Space when such a set is opened.
+const MERGED_INTO_SPACE = ["interplanetary", "escaping", "suborbital", "orbit"];
+// Situations for a place card: tick any mix (none = anywhere around it). They're combined into one KSP situation
+// mask; an optional height limit (maxAltitude) covers "low over an airless body", where nothing counts as flying.
 const SITUATIONS = {
-  any: { label: "anywhere around it", when: {} },
-  orbit: { label: "in orbit", when: { situation: "ORBITING | SUB_ORBITAL | ESCAPING" } },
-  landed: { label: "on the surface", when: { situation: "LANDED | SPLASHED" } },
-  flying: { label: "flying in its atmosphere", when: { situation: "FLYING" } },
+  surface: { label: "on the surface", short: "surface", mask: "LANDED | SPLASHED" },
+  flying: { label: "flying in its atmosphere", short: "flying", mask: "FLYING" },
+  space: { label: "in space around it", short: "space", mask: "SUB_ORBITAL | ORBITING" },
+  escaping: { label: "leaving it (escape trajectory)", short: "leaving", mask: "ESCAPING" },
 };
+const OLD_SIT = { any: [], orbit: ["space"], landed: ["surface"], flying: ["flying"], escaping: ["escaping"] };
 // The default picks: as close to stock KSP as open music allows (user, 2026-11-06). KSP played music only in space
 // (Kevin MacLeod's tracks, shuffled) and kept quiet on the pad, in the atmosphere and on the ground; the menu, VAB,
 // tracking station and R&D had themes of their own. Silence is a shipped track, since an empty situation would hand
@@ -146,7 +148,7 @@ const DEFAULTS = {
   menu: ["TW_Home"], credits: ["MacLeod_GrooveGrove"], editor: ["MacLeod_SneakyAdventure", "TW_VabVibes"], rnd: ["TW_LabcoatsGalore"],
   ksc_day: ["TW_MyCapsuleMySnacksAndMe"], ksc_night: ["TW_BalconyMoongazing"], tracking: ["TW_LullabyForAPlanetarium"],
   launch: SILENCE, landed: SILENCE, atmo: SILENCE,
-  interplanetary: KSP_SPACE, escaping: KSP_SPACE, suborbital: KSP_SPACE, orbit: KSP_SPACE,
+  space: KSP_SPACE,
 };
 const DEFAULT_BODIES = [];
 
@@ -155,10 +157,17 @@ const $ = s => document.querySelector(s);
 const fmt = s => s == null ? "" : `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
 
 function bodyCard(b) {
-  const s = SITUATIONS[b.sit] || SITUATIONS.any;
-  return { group: "Places", id: "body_" + b.body.replace(/[^A-Za-z0-9]/g, "") + "_" + b.sit, title: b.title || b.body.split("|")[0].trim(),
-           desc: `Around ${b.body.split("|").map(x => x.trim()).join(" / ")}, ${s.label}`, custom: { body: b.body, sit: b.sit },
-           when: { scene: "Flight", bodyName: b.body, ...s.when }, loop: true, shuffle: true, pauseOnGamePause: true, tracks: b.tracks || [] };
+  const sits = Array.isArray(b.sit) ? b.sit : OLD_SIT[b.sit] ?? [];
+  const below = Number(b.belowKm) > 0 ? Number(b.belowKm) : null;
+  const when = { scene: "Flight", bodyName: b.body };
+  if (sits.length) when.situation = sits.map(k => SITUATIONS[k].mask).join(" | ");
+  if (below) when.maxAltitude = Math.round(below * 1000);
+  const where = sits.length ? sits.map(k => SITUATIONS[k].label).join(", ") : "anywhere around it";
+  return { group: "Places", id: "body_" + b.body.replace(/[^A-Za-z0-9]/g, "") + "_" + (sits.join("-") || "any") + (below ? "_" + below + "km" : ""),
+           // a distinct default title: KSAMusic tells playlists apart by name
+           title: b.title || `${b.body.split("|").map(x => x.trim()).join(" / ")} · ${sits.length ? sits.map(k => SITUATIONS[k].short).join(", ") : "anywhere"}${below ? `, below ${below} km` : ""}`,
+           desc: `Around ${b.body.split("|").map(x => x.trim()).join(" / ")}: ${where}${below ? `, below ${below} km` : ""}`,
+           custom: { body: b.body, sit: sits, belowKm: below }, when, loop: true, shuffle: true, pauseOnGamePause: true, tracks: b.tracks || [] };
 }
 
 function freshState() {
@@ -168,12 +177,21 @@ function freshState() {
 
 // Place body cards before the general flight cards, so "around the Mun" wins over "in orbit".
 function ordered() {
-  const order = c => c.file === "menu" ? 0 : c.group === "Buildings" ? 1 : c.custom ? 2 : 3;
+  // places with a height limit before the others, so "low over the Mun" wins over "around the Mun"
+  const order = c => c.file === "menu" ? 0 : c.group === "Buildings" ? 1 : c.custom ? (c.custom.belowKm ? 2 : 2.5) : 3;
   return [...state.cards].sort((a, b) => order(a) - order(b));
 }
 
 // keep cards in sync with BASE (new situations added later show up; their saved picks are kept)
 function syncBase() {
+  const old = state.cards.filter(c => MERGED_INTO_SPACE.includes(c.id));
+  if (old.length) {
+    state.cards = state.cards.filter(c => !MERGED_INTO_SPACE.includes(c.id));
+    if (!state.cards.some(c => c.id === "space")) {
+      const b = BASE.find(x => x.id === "space");
+      state.cards.push({ ...b, tracks: [...new Set(old.flatMap(c => c.tracks))] });
+    }
+  }
   for (const b of BASE) {
     const have = state.cards.find(c => c.id === b.id);
     if (have) Object.assign(have, { group: b.group, title: b.title, desc: b.desc, when: b.when, file: b.file });
@@ -217,8 +235,8 @@ function renderCards() {
   const root = $("#cards");
   root.innerHTML = "";
   const groups = ["Menu", "Buildings", "Places", "Flight"];
-  const help = { Places: "Body-specific music wins over the general flight situations below.",
-                 Flight: "Checked in this order; the first one that matches plays." };
+  const help = { Places: "Music for one body (or for between the planets: pick the star) wins over the general flight situations below.",
+                 Flight: "Checked in this order; the first one that matches plays. Places above win over these." };
   for (const g of groups) {
     const cards = ordered().filter(c => c.group === g);
     const sec = document.createElement("div");
@@ -314,14 +332,18 @@ function addForm() {
   const el = document.createElement("div");
   el.className = "add";
   const systems = systemsOrdered();
-  const sitOptions = Object.entries(SITUATIONS).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("");
+  const sitBoxes = `<div class="sits" style="width:100%;display:flex;gap:10px;flex-wrap:wrap;color:var(--muted)">` +
+    Object.entries(SITUATIONS).map(([k, v]) => `<label><input type="checkbox" class="sit" value="${k}"> ${v.label}</label>`).join("") +
+    `<label title="Leave empty for any height">only below <input id="belowKm" type="number" min="0" step="any" style="width:70px"> km</label>` +
+    `<span style="width:100%;font-size:12px">None ticked = anywhere around it.</span></div>`;
+  const readSits = () => [...el.querySelectorAll(".sit:checked")].map(x => x.value);
   if (!systems.length) {
     el.innerHTML = `<b>Add a place</b>
       <div class="legend" style="width:100%">No body list yet: start KSA once with KSAMusic and it is filled in from the game. Until then you can type
       exact body ids (separate several with |); a misspelt name never matches.</div>
-      <input id="newBody" placeholder="Body id, e.g. Duna" size="16"><select id="newSit">${sitOptions}</select>
+      <input id="newBody" placeholder="Body id, e.g. Duna" size="16">${sitBoxes}
       <input id="newTitle" placeholder="Card title (optional)" size="14"><button id="addBody">Add</button>`;
-    el.querySelector("#addBody").onclick = () => addBodyCard(el.querySelector("#newBody").value.trim(), el.querySelector("#newSit").value, el.querySelector("#newTitle").value.trim());
+    el.querySelector("#addBody").onclick = () => addBodyCard(el.querySelector("#newBody").value.trim(), readSits(), el.querySelector("#newTitle").value.trim(), el.querySelector("#belowKm").value);
     return el;
   }
   if (!pickSystem || !systems.some(x => x.id === pickSystem)) pickSystem = systems[0].id;
@@ -335,7 +357,7 @@ function addForm() {
     <select id="pickBodies" multiple size="9" style="width:100%">${shown.map(b =>
       `<option value="${b.id}">${"\u00a0\u00a0\u00a0".repeat(b.depth)}${b.id}  ·  ${b.kind}</option>`).join("")}</select>
     ${opts.length > shown.length ? `<div class="legend" style="width:100%">${opts.length - shown.length} more: search to narrow it down</div>` : ""}
-    <select id="newSit">${sitOptions}</select>
+    ${sitBoxes}
     <input id="newTitle" placeholder="Card title (optional)" size="14">
     <button id="addBody">Add</button>
     <div class="legend" style="width:100%">Ctrl- or Shift-click to pick several bodies for one card.${bodiesData.fromFiles ? " List read from the game's system files; it updates from the game itself once KSA has run with KSAMusic." : ""}</div>`;
@@ -351,15 +373,16 @@ function addForm() {
   el.querySelector("#addBody").onclick = () => {
     const picked = [...el.querySelector("#pickBodies").selectedOptions].map(o => o.value);
     if (!picked.length) { alert("Pick one or more bodies from the list first."); return; }
-    addBodyCard(picked.join(" | "), el.querySelector("#newSit").value, el.querySelector("#newTitle").value.trim() || picked.join(" / "));
+    addBodyCard(picked.join(" | "), readSits(), el.querySelector("#newTitle").value.trim(), el.querySelector("#belowKm").value);
   };
   return el;
 }
 
-function addBodyCard(body, sit, title) {
+function addBodyCard(body, sit, title, belowKm) {
   if (!body) return;
-  const card = bodyCard({ body, sit, title });
+  const card = bodyCard({ body, sit, title, belowKm });
   if (state.cards.some(c => c.id === card.id)) { alert("There's already a card for that place and situation."); return; }
+  if (state.cards.some(c => c.title === card.title)) { alert(`There's already a card called "${card.title}": give this one another title.`); return; }
   state.cards.push(card);
   changed();
 }

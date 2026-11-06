@@ -46,6 +46,8 @@
    "pauseOnGamePause": false,
    "tracks": [
     "MacLeod_SneakyAdventure",
+    "MacLeod_BrittleRille",
+    "MacLeod_GrooveGrove",
     "TW_VabVibes"
    ]
   },
@@ -53,7 +55,7 @@
    "group": "Buildings",
    "id": "rnd",
    "title": "R&D",
-   "desc": "The tech tree (with KSAScience)",
+   "desc": "An R&D / tech tree screen, if a mod adds one",
    "when": {
     "scene": "RnDComplex"
    },
@@ -68,7 +70,7 @@
    "group": "Buildings",
    "id": "ksc_day",
    "title": "Space centre (day)",
-   "desc": "Space-centre view, daytime",
+   "desc": "A space-centre view by day, if a mod adds one",
    "when": {
     "scene": "SpaceCentre",
     "timeOfDay": "DayAM | DayPM | TwilightAM"
@@ -77,14 +79,14 @@
    "shuffle": true,
    "pauseOnGamePause": false,
    "tracks": [
-    "TW_MyCapsuleMySnacksAndMe"
+    "TW_Home"
    ]
   },
   {
    "group": "Buildings",
    "id": "ksc_night",
    "title": "Space centre (night)",
-   "desc": "Space-centre view, evening and night",
+   "desc": "A space-centre view by evening and night, if a mod adds one",
    "when": {
     "scene": "SpaceCentre",
     "timeOfDay": "TwilightPM | NightAM | NightPM"
@@ -109,6 +111,48 @@
    "pauseOnGamePause": false,
    "tracks": [
     "TW_LullabyForAPlanetarium"
+   ]
+  },
+  {
+   "group": "Places",
+   "id": "body_Mun_landed",
+   "title": "Mun",
+   "desc": "Around Mun, on the surface",
+   "custom": {
+    "body": "Mun",
+    "sit": "landed"
+   },
+   "when": {
+    "scene": "Flight",
+    "bodyName": "Mun",
+    "situation": "LANDED | SPLASHED"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": true,
+   "tracks": [
+    "TW_OneSmallStep"
+   ]
+  },
+  {
+   "group": "Places",
+   "id": "body_Luna_landed",
+   "title": "Luna",
+   "desc": "Around Luna, on the surface",
+   "custom": {
+    "body": "Luna",
+    "sit": "landed"
+   },
+   "when": {
+    "scene": "Flight",
+    "bodyName": "Luna",
+    "situation": "LANDED | SPLASHED"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": true,
+   "tracks": [
+    "TW_OneSmallStep"
    ]
   },
   {
@@ -161,87 +205,13 @@
   },
   {
    "group": "Flight",
-   "id": "interplanetary",
-   "title": "Interplanetary",
-   "desc": "Orbiting the star itself, between the planets",
+   "id": "space",
+   "title": "Space",
+   "desc": "Off the ground and outside any atmosphere: orbits, hops, transfers. For one body, or between the planets, add a place above.",
    "when": {
     "scene": "Flight",
-    "bodyName": "Sun | Kerbol | Sol"
-   },
-   "loop": true,
-   "shuffle": true,
-   "pauseOnGamePause": true,
-   "tracks": [
-    "MacLeod_Arcadia",
-    "MacLeod_BathedInTheLight",
-    "MacLeod_BrittleRille",
-    "MacLeod_DreamyFlashback",
-    "MacLeod_FrostWaltz",
-    "MacLeod_FrostWaltzAlternate",
-    "MacLeod_FrozenStar",
-    "MacLeod_GrooveGrove",
-    "MacLeod_ImpactLento",
-    "MacLeod_Wizardtorium"
-   ]
-  },
-  {
-   "group": "Flight",
-   "id": "escaping",
-   "title": "Leaving a body",
-   "desc": "On an escape trajectory",
-   "when": {
-    "scene": "Flight",
-    "situation": "ESCAPING"
-   },
-   "loop": true,
-   "shuffle": true,
-   "pauseOnGamePause": true,
-   "tracks": [
-    "MacLeod_Arcadia",
-    "MacLeod_BathedInTheLight",
-    "MacLeod_BrittleRille",
-    "MacLeod_DreamyFlashback",
-    "MacLeod_FrostWaltz",
-    "MacLeod_FrostWaltzAlternate",
-    "MacLeod_FrozenStar",
-    "MacLeod_GrooveGrove",
-    "MacLeod_ImpactLento",
-    "MacLeod_Wizardtorium"
-   ]
-  },
-  {
-   "group": "Flight",
-   "id": "suborbital",
-   "title": "Sub-orbital",
-   "desc": "Up but coming back down: hops and re-entry",
-   "when": {
-    "scene": "Flight",
-    "situation": "SUB_ORBITAL"
-   },
-   "loop": true,
-   "shuffle": true,
-   "pauseOnGamePause": true,
-   "tracks": [
-    "MacLeod_Arcadia",
-    "MacLeod_BathedInTheLight",
-    "MacLeod_BrittleRille",
-    "MacLeod_DreamyFlashback",
-    "MacLeod_FrostWaltz",
-    "MacLeod_FrostWaltzAlternate",
-    "MacLeod_FrozenStar",
-    "MacLeod_GrooveGrove",
-    "MacLeod_ImpactLento",
-    "MacLeod_Wizardtorium"
-   ]
-  },
-  {
-   "group": "Flight",
-   "id": "orbit",
-   "title": "In orbit",
-   "desc": "Orbiting any planet or moon",
-   "when": {
-    "scene": "Flight",
-    "situation": "ORBITING"
+    "situation": "SUB_ORBITAL | ORBITING | ESCAPING",
+    "inAtmosphere": false
    },
    "loop": true,
    "shuffle": true,
