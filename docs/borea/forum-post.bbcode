@@ -1,0 +1,59 @@
+[HEADING=2]KSAMusic 0.1.0[/HEADING]
+Situational music for Kitten Space Agency, the way KSP did it: the right track for where you are and what you're doing, with a drag-and-drop editor to make the soundtrack your own. A StarMap mod.
+
+Out of the box it sounds as close to stock KSP as open music allows: Kevin MacLeod's KSP tracks shuffle while you're in space, the pad, the ground and the atmosphere stay quiet, and the main menu, the vehicle editor and the tracking station get themes from Askerad's Transfer Windows, a fan-made KSP soundtrack.
+
+[IMG alt="KSAMusic"]https://raw.githubusercontent.com/ghost225/KSAMusic/0701c85/content/icon.png[/IMG]
+
+No game files are modified.
+
+[HEADING=3]Features[/HEADING]
+[LIST]
+[*][B]Music that follows the game.[/B] Playlists switch by scene (main menu, vehicle editor, tracking station, flight), by situation (launch, on the ground, flying, sub-orbital, in orbit, escaping, between the planets) and by body.
+[*][B]A playlist editor.[/B] Music → Edit playlists... in the top menu bar opens it in your browser. Drag tracks onto situations, reorder them, preview anything with the player at the bottom, and add music for a particular planet or moon by picking from the bodies actually in your game, mods included. Save applies it in game straight away; Reset to preset brings the default back.
+[*][B]Your own music.[/B] Put .ogg files in KSAMusic/Music in your game profile (the editor shows the exact folder) and they appear in the editor to assign.
+[*][B]KSA's own music[/B] is in the editor too, played from your game install.
+[*][B]A Music menu[/B] in the top bar: what's playing, next track, mute, volume, and a small status window.
+[*][B]KSP music packs.[/B] It reads Soundtrack Editor Forked's playlists.cfg format, so packs like Dynamic Music Overhaul work with their own playlists.
+[/LIST]
+Works on its own. With [URL='https://github.com/ghost225/KSAMainMenu']Kitten Main Menu[/URL] it also plays music on the main menu and the credits screen.
+
+[HEADING=3]Status[/HEADING]
+[B]Heads-up:[/B] this mod was built with Claude (Anthropic's AI), with me directing, testing and reviewing. The full source is on GitHub, so you can check what you're installing.
+
+The music player itself has been running on my Linux install since late October, on KSA 2026.10.25.5707. The default soundtrack and the playlist editor are new in this release. Windows should work but hasn't been tried. Reports are very welcome, here or as a GitHub issue, ideally with the lines from [ICODE]KSAMusic.log[/ICODE] in the mod's folder.
+
+[HEADING=3]Known limits[/HEADING]
+[LIST]
+[*]KSA has no separate space-centre, R&D or astronaut-complex scenes yet, so those situations only play when a mod adds them.
+[*]The editor runs in your browser, served by the game on your own machine (127.0.0.1 only), so it works while KSA is running.
+[*]A mod update replaces the mod folder; your saved playlists and own music are kept in your game profile, so they survive it.
+[/LIST]
+
+[HEADING=3]Installation[/HEADING]
+Requires [URL='https://github.com/StarMapLoader/StarMap']StarMap[/URL] 0.4.7 or newer.
+[LIST=1]
+[*]Install StarMap and run the game once through it.
+[*]Extract the release zip into [ICODE]Documents/My Games/Kitten Space Agency/mods/[/ICODE], giving [ICODE]mods/KSAMusic/KSAMusic.dll[/ICODE].
+[*]Launch the game once and close it. KSA adds new mods to [ICODE]manifest.toml[/ICODE] disabled: set this mod's entry to [ICODE]enabled = true[/ICODE].
+[*]Launch through StarMap.
+[/LIST]
+To uninstall, delete [ICODE]mods/KSAMusic[/ICODE], and the [ICODE]KSAMusic[/ICODE] folder in your game profile if you saved playlists or added music.
+
+[B]Network use:[/B] none. The editor is served on 127.0.0.1 only; nothing is downloaded or sent anywhere.
+
+[HEADING=3]Credits[/HEADING]
+[LIST]
+[*][B]Transfer Windows[/B] (Vol. 1, Vol. 2 and The Dark Sounds Of The Mun EP) by [URL='https://www.youtube.com/channel/UCkmEzU58CnNtMk8eDCPG6EQ']Askerad[/URL], under Creative Commons Attribution 3.0.
+[*][B]Kevin MacLeod[/B]: Arcadia, Bathed in the Light, Brittle Rille, Dreamy Flashback, Frost Waltz, Frost Waltz (Alternate), Frozen Star, Groove Grove, Impact Lento, Wizardtorium and Sneaky Adventure ([URL='https://incompetech.com']incompetech.com[/URL]), licensed under Creative Commons: By Attribution 4.0 License.
+[*]Kitten Space Agency's own music is by RocketWerkz; it's played from your game install and isn't included.
+[*]The playlist format and rules follow Soundtrack Editor Forked, so music packs made for KSP work.
+[/LIST]
+Every track's attribution, with links, is in [ICODE]CREDITS.md[/ICODE] in the download.
+
+[B]Version:[/B] 0.1.0, built on KSA 2026.10.25.5707
+[B]License:[/B] code MIT; music CC BY 3.0 (Askerad), CC BY 4.0 (Kevin MacLeod)
+[B]Source:[/B] [URL='https://github.com/ghost225/KSAMusic']GitHub[/URL]
+[B]Download:[/B] [URL='https://github.com/ghost225/KSAMusic/releases']GitHub Releases[/URL] (Borea listing to follow)
+[B]Dependencies:[/B] [URL='https://github.com/StarMapLoader/StarMap']StarMap[/URL] 0.4.7+ (required)
+[B]Bug reports:[/B] [URL='https://github.com/ghost225/KSAMusic/issues']GitHub issues[/URL]
