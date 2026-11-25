@@ -334,26 +334,27 @@ internal static class EditorServer
         try
         {
             var systems = new JsonArray();
-            var ids = KSA.SelectSystem.Systems.Select(x => x.Id).Distinct().OrderBy(x => x == current ? 0 : 1).ToList();
+            // KSA 5801: the picker's systems come from SystemLibrary, and a system's bodies are references (r5708).
+            var picker = KSA.SystemLibrary.PickerSystems();
+            var ids = picker.Select(x => x.Id).Distinct().OrderBy(x => x == current ? 0 : 1).ToList();
             foreach (string id in ids)
             {
-                var info = KSA.SelectSystem.Systems.FirstOrDefault(x => x.Id == id);
-                var template = KSA.SystemLibrary.Find(id);
+                var template = picker.FirstOrDefault(x => x.Id == id) ?? KSA.SystemLibrary.Find(id);
                 if (template == null) continue;
                 var bodies = new List<(string Id, string Parent, string Kind)>();
-                foreach (var t in template.Bodies)
+                foreach (var entry in template.Bodies)
                 {
-                    KSA.AstronomicalTemplate r = t;
-                    try { r = (t as KSA.AstronomicalReference)?.Resolve() ?? t; } catch { }
+                    KSA.AstronomicalTemplate? r = entry?.Value;
+                    if (r == null) continue;
                     string kind = r switch
                     {
                         KSA.VehicleTemplate or KSA.BarycenterTemplate => "",
                         KSA.StellarBodyTemplate => "star",
                         _ => "body",
                     };
-                    if (kind == "" || string.IsNullOrEmpty(t.Id)) continue;
-                    string parent = !string.IsNullOrEmpty(t.ParentId) ? t.ParentId : r.ParentId ?? "";
-                    bodies.Add((t.Id, parent, kind));
+                    if (kind == "" || string.IsNullOrEmpty(r.Id)) continue;
+                    string parent = r.ParentBody?.Value?.Id ?? r.ParentBody?.Ref ?? "";
+                    bodies.Add((r.Id, parent, kind));
                 }
                 // planet or moon: a body whose parent is a star (or nothing known) is a planet, else a moon
                 var stars = bodies.Where(b => b.Kind == "star").Select(b => b.Id).ToHashSet();
@@ -366,7 +367,7 @@ internal static class EditorServer
                     });
                 systems.Add(new JsonObject
                 {
-                    ["id"] = id, ["name"] = info?.GetName() is { Length: > 0 } n ? n : id, ["loaded"] = id == current, ["bodies"] = arr,
+                    ["id"] = id, ["name"] = (string)template.DisplayName is { Length: > 0 } n ? n : id, ["loaded"] = id == current, ["bodies"] = arr,
                 });
             }
             var snap = new JsonObject { ["current"] = current, ["systems"] = systems };

@@ -14,6 +14,8 @@
    "shuffle": false,
    "pauseOnGamePause": false,
    "tracks": [
+    "Vano_MainTheme",
+    "08_SunSynchronous",
     "TW_Home"
    ]
   },
@@ -47,6 +49,7 @@
    "tracks": [
     "MacLeod_SneakyAdventure",
     "MacLeod_BrittleRille",
+    "Vano_Construction1",
     "MacLeod_GrooveGrove",
     "TW_VabVibes"
    ]
@@ -63,7 +66,7 @@
    "shuffle": true,
    "pauseOnGamePause": false,
    "tracks": [
-    "TW_LabcoatsGalore"
+    "Vano_UnderConstruction"
    ]
   },
   {
@@ -95,7 +98,7 @@
    "shuffle": true,
    "pauseOnGamePause": false,
    "tracks": [
-    "TW_BalconyMoongazing"
+    "TW_LullabyForAPlanetarium"
    ]
   },
   {
@@ -115,44 +118,119 @@
   },
   {
    "group": "Places",
-   "id": "body_Mun_landed",
-   "title": "Mun",
-   "desc": "Around Mun, on the surface",
+   "id": "body_Duna_space",
+   "title": "Duna \u00b7 space",
+   "desc": "Around Duna: in space around it",
    "custom": {
-    "body": "Mun",
-    "sit": "landed"
+    "body": "Duna",
+    "sit": [
+     "space"
+    ],
+    "belowKm": null
    },
    "when": {
     "scene": "Flight",
-    "bodyName": "Mun",
-    "situation": "LANDED | SPLASHED"
+    "bodyName": "Duna",
+    "situation": "SUB_ORBITAL | ORBITING"
    },
    "loop": true,
    "shuffle": true,
    "pauseOnGamePause": true,
    "tracks": [
-    "TW_OneSmallStep"
+    "TW_VoidDwellers",
+    "Vano_RedPlanet"
    ]
   },
   {
    "group": "Places",
-   "id": "body_Luna_landed",
-   "title": "Luna",
-   "desc": "Around Luna, on the surface",
+   "id": "body_Mun_space",
+   "title": "Mun \u00b7 space",
+   "desc": "Around Mun: in space around it",
    "custom": {
-    "body": "Luna",
-    "sit": "landed"
+    "body": "Mun",
+    "sit": [
+     "space"
+    ],
+    "belowKm": null
    },
    "when": {
     "scene": "Flight",
-    "bodyName": "Luna",
-    "situation": "LANDED | SPLASHED"
+    "bodyName": "Mun",
+    "situation": "SUB_ORBITAL | ORBITING"
    },
    "loop": true,
    "shuffle": true,
    "pauseOnGamePause": true,
    "tracks": [
-    "TW_OneSmallStep"
+    "TWMun_Nebulosus",
+    "TWMun_OrbitalClockwork",
+    "TWMun_ZeroGEpiphany"
+   ]
+  },
+  {
+   "group": "Places",
+   "id": "body_Minmus_space",
+   "title": "Minmus \u00b7 space",
+   "desc": "Around Minmus: in space around it",
+   "custom": {
+    "body": "Minmus",
+    "sit": [
+     "space"
+    ],
+    "belowKm": null
+   },
+   "when": {
+    "scene": "Flight",
+    "bodyName": "Minmus",
+    "situation": "SUB_ORBITAL | ORBITING"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": true,
+   "tracks": [
+    "MacLeod_FrozenStar"
+   ]
+  },
+  {
+   "group": "Places",
+   "id": "body_Eve_any",
+   "title": "Eve \u00b7 anywhere",
+   "desc": "Around Eve: anywhere around it",
+   "custom": {
+    "body": "Eve",
+    "sit": [],
+    "belowKm": null
+   },
+   "when": {
+    "scene": "Flight",
+    "bodyName": "Eve"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": true,
+   "tracks": [
+    "TW_PurpleQueen"
+   ]
+  },
+  {
+   "group": "Places",
+   "id": "body_Jool_any",
+   "title": "Jool \u00b7 anywhere",
+   "desc": "Around Jool: anywhere around it",
+   "custom": {
+    "body": "Jool",
+    "sit": [],
+    "belowKm": null
+   },
+   "when": {
+    "scene": "Flight",
+    "bodyName": "Jool"
+   },
+   "loop": true,
+   "shuffle": true,
+   "pauseOnGamePause": true,
+   "tracks": [
+    "Vano_Jool"
    ]
   },
   {
@@ -168,7 +246,7 @@
    "shuffle": false,
    "pauseOnGamePause": true,
    "tracks": [
-    "KSAMusic_Silence"
+    "Vano_Liftoff"
    ]
   },
   {
@@ -200,7 +278,7 @@
    "shuffle": true,
    "pauseOnGamePause": true,
    "tracks": [
-    "KSAMusic_Silence"
+    "TW_CorrectionManeuvre"
    ]
   },
   {
@@ -217,16 +295,13 @@
    "shuffle": true,
    "pauseOnGamePause": true,
    "tracks": [
-    "MacLeod_Arcadia",
-    "MacLeod_BathedInTheLight",
-    "MacLeod_BrittleRille",
-    "MacLeod_DreamyFlashback",
-    "MacLeod_FrostWaltz",
-    "MacLeod_FrostWaltzAlternate",
-    "MacLeod_FrozenStar",
-    "MacLeod_GrooveGrove",
-    "MacLeod_ImpactLento",
-    "MacLeod_Wizardtorium"
+    "Vano_Spacewalk",
+    "Vano_Expedition12",
+    "00_Drifting",
+    "Vano_Expedition13",
+    "06_TheSmallBlueDot",
+    "08_SunSynchronous",
+    "05_LEOSunrise"
    ]
   }
  ]

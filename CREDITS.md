@@ -2,6 +2,8 @@
 
 Every track that ships with KSAMusic, with the attribution its licence asks for.
 
+Some playlists also use Kitten Space Agency's own music (by RocketWerkz). It isn't included here: KSAMusic plays it from your game install.
+
 ## Transfer Windows, Vol. 1
 
 - "Home" by Askerad (https://www.youtube.com/watch?v=0INHLhbzWO8), licensed under CC BY 3.0
@@ -27,17 +29,28 @@ Every track that ships with KSAMusic, with the attribution its licence asks for.
 
 ## Kevin MacLeod (KSP)
 
-- "Arcadia" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 License, http://creativecommons.org/licenses/by/4.0/
-- "Bathed in the Light" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 License, http://creativecommons.org/licenses/by/4.0/
 - "Brittle Rille" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 License, http://creativecommons.org/licenses/by/4.0/
-- "Dreamy Flashback" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 License, http://creativecommons.org/licenses/by/4.0/
-- "Frost Waltz" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 License, http://creativecommons.org/licenses/by/4.0/
-- "Frost Waltz (Alternate)" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 License, http://creativecommons.org/licenses/by/4.0/
 - "Frozen Star" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 License, http://creativecommons.org/licenses/by/4.0/
 - "Groove Grove" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 License, http://creativecommons.org/licenses/by/4.0/
-- "Impact Lento" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 License, http://creativecommons.org/licenses/by/4.0/
-- "Wizardtorium" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 License, http://creativecommons.org/licenses/by/4.0/
 - "Sneaky Adventure" Kevin MacLeod (incompetech.com), Licensed under Creative Commons: By Attribution 4.0 License, http://creativecommons.org/licenses/by/4.0/
+
+## Vano's Soundtrack (Construction)
+
+- "Construction 1" by MusicByVano, licensed under CC BY-SA 4.0
+- "Expedition 12" by MusicByVano, licensed under CC BY-SA 4.0
+- "Expedition 13" by MusicByVano, licensed under CC BY-SA 4.0
+- "Under Construction" by MusicByVano, licensed under CC BY-SA 4.0
+
+## Vano's Soundtrack (KSC)
+
+- "Main Theme" by MusicByVano, licensed under CC BY-SA 4.0
+
+## Vano's Soundtrack (Space)
+
+- "Jool" by MusicByVano, licensed under CC BY-SA 4.0
+- "Liftoff" by MusicByVano, licensed under CC BY-SA 4.0
+- "Red Planet" by MusicByVano, licensed under CC BY-SA 4.0
+- "Spacewalk" by MusicByVano, licensed under CC BY-SA 4.0
 
 ## KSAMusic
 

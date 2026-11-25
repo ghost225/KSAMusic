@@ -56,6 +56,7 @@ internal static class Sampler
     private static double _armedTravel, _falling, _peak;    // _peak: highest altitude since the last ground contact
 
     private static string? _lastTodBody;
+    private static object? _lastUniverse;
     private static double _lastElevation = double.NaN;
     private static bool _rising = true;
 
@@ -65,6 +66,16 @@ internal static class Sampler
     {
         var s = new GameState { IsKerbol = Peers.IsKerbol, Paused = SafeIsPaused() };
         var cam = Program.GetCamera();
+
+        // KSA 5916+ can switch star systems (and universes) when a save loads: forget the last flight's launch state.
+        var universe = Universe.CurrentSystem;
+        if (!ReferenceEquals(universe, _lastUniverse))
+        {
+            _lastUniverse = universe;
+            _ascent = Ascent.None;
+            _peak = double.NaN;
+            _lastTodBody = null;
+        }
 
         if (SceneOverride != null) s.Scenes.Add(SceneOverride);
         else if (Peers.MenuCredits) s.Scenes.Add("Credits");
@@ -100,9 +111,7 @@ internal static class Sampler
         s.SurfaceSpeed = v.GetSurfaceSpeed();
         s.OrbitalSpeed = v.OrbitalSpeed;
 
-        double atmoTop = 0;
-        if (parent is Celestial c && c.GetAtmosphereReference() is { } atmo)
-            atmoTop = (double)atmo.Physical.Height;
+        double atmoTop = parent.GetPhysicalAtmosphere()?.Height ?? 0;   // KSA 5801 split the atmosphere data (r5800)
         s.InAtmosphere = atmoTop > 0 && s.Altitude < atmoTop;
 
         var t = Tracks.GetOrCreateValue(v);
